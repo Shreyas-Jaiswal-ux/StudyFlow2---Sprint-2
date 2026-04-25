@@ -945,3 +945,169 @@ xychart-beta
 
 ---
 
+
+# 6. Completion & Testing
+
+## 6.1 Requirements Traceability
+
+| ID | Requirement | Implemented? | Evidence |
+|----|-------------|-------------|----------|
+| US-01 | Create a task with title and deadline | Yes | Task form, T-01 |
+| US-02 | Assign priority level | Yes | Dropdown with Low/Medium/High, T-01 |
+| US-03 | Tag task with module name | Yes | Module input, badge on card, T-08 |
+| US-04 | Mark task as complete | Yes | Checkbox toggle, T-11, T-12 |
+| US-05 | View tasks for today | Yes [S2] | Today view filter (BL-09), T-23 |
+| US-06 | Edit an existing task | Yes | Edit button pre-fills form, T-13-T-15 |
+| US-07 | Delete a task | Yes | Delete with confirmation, T-16-T-18 |
+| US-08 | View tasks for current week | Yes [S2] | This Week view filter (BL-09), T-24 |
+| US-10 | Filter by module | Yes [S2] | Module search input (BL-11), T-29 |
+| US-11 | Filter by priority | Yes [S2] | Priority filter buttons (BL-11), T-28 |
+| US-12 | Progress summary | Yes [S2] | Header stats and progress bar (BL-15), T-36-T-40 |
+| US-13 | Sort by deadline or priority | Yes [S2] | Sort control (BL-12), T-33-T-35 |
+| US-14 | Tasks saved between sessions | Yes | localStorage persistence |
+| SR-01 | Full CRUD operations | Yes | Create, read, update, delete all functional |
+| SR-02 | Daily view | Yes [S2] | Today filter (BL-09), T-23 |
+| SR-03 | Weekly view | Yes [S2] | This Week filter (BL-09), T-24 |
+| SR-04 | Filter by module and priority | Yes [S2] | BL-11, T-28-T-32 |
+| SR-05 | Priority colour coding | Yes | Green/amber/red badges and borders, T-09 |
+| SR-07 | localStorage persistence | Yes | Persists across refresh |
+| SR-08 | Progress summary display | Yes [S2] | Header stats, progress bar (BL-15) |
+| NFR-01 | HTML/CSS/JS, no backend | Yes | App runs from three files in the browser |
+| NFR-02 | Mobile-first responsive | Yes | 360-428px base, 768px breakpoint |
+| NFR-07 | Input validation | Yes | Empty title, missing deadline, past date blocked |
+| NFR-08 | Modular codebase | Yes | Separate HTML, CSS, JS files with organised sections |
+
+---
+
+## 6.2 Completed Test Log
+
+### Sprint 1 Tests
+
+| Test ID | BL | Status | Actual Result | Date | Notes |
+|---------|----|--------|---------------|------|-------|
+| T-01 | BL-02 | Pass | Task created with all details correct. Appeared in list immediately. | 19 Mar | - |
+| T-02 | BL-02 | Pass | All form fields cleared to defaults after submission. Priority reset to Medium. | 19 Mar | - |
+| T-03 | BL-02 | Pass | Task object contains id (string), title, deadline (YYYY-MM-DD), priority, module, completed (false). | 19 Mar | ID is `Date.now().toString(36)` + random |
+| T-04 | BL-03 | Pass | Form did not submit. Error `Please enter a task title.` shown below title field. | 19 Mar | - |
+| T-05 | BL-03 | Pass | Form did not submit. Error `Please select a deadline.` shown below deadline field. | 19 Mar | - |
+| T-06 | BL-03 | Pass | Form did not submit. Error `Deadline cannot be in the past.` shown below deadline field. | 19 Mar | Tested with yesterday's date |
+| T-07 | BL-03 | Pass | Error message cleared as soon as text was typed in the title field. | 19 Mar | - |
+| T-08 | BL-04 | Pass | Card showed title, formatted deadline, module badge, and priority badge. | 19 Mar | - |
+| T-09 | BL-04 | Pass | Low = green badge, Medium = amber, High = red. Left border matches. | 19 Mar | - |
+| T-10 | BL-04 | Pass | New task appeared without page refresh. | 19 Mar | - |
+| T-11 | BL-05 | Pass | Checkbox faded the card and applied strikethrough. `completed = true` in array. | 19 Mar | - |
+| T-12 | BL-05 | Pass | Second checkbox click restored full opacity. `completed = false`. | 19 Mar | - |
+| T-13 | BL-06 | Pass | Edit populated form with current values. Heading changed to `Edit Task`. Cancel button appeared. | 19 Mar | - |
+| T-14 | BL-06 | Pass | Updated title reflected in card immediately after Save Changes. | 19 Mar | - |
+| T-15 | BL-06 | Pass | Task unchanged after clicking Cancel. Form reset to Add New Task mode. | 19 Mar | - |
+| T-16 | BL-07 | Pass | Browser confirm dialog appeared: `Are you sure you want to delete 'SD2 Report'?` | 19 Mar | - |
+| T-17 | BL-07 | Pass | Task removed from list immediately after clicking OK. | 19 Mar | - |
+| T-18 | BL-07 | Pass | Task remained in list after clicking Cancel. | 19 Mar | - |
+| T-19 | BL-08 | Pass | Single-column layout at 375px. No horizontal scrolling. Text readable at 16px. | 19 Mar | - |
+| T-20 | BL-08 | Pass | Two-column grid at 1024px. Form left (sticky), task list right. | 19 Mar | - |
+| T-21 | BL-08 | Pass | Add Task button renders at 44px height minimum. Edit and Delete buttons also pass. | 19 Mar | - |
+| T-22 | BL-08 | Pass | Header dark blue (`#1A3A5C`). Cards white with coloured left border. Priority badges match palette. | 19 Mar | - |
+
+### [S2] Sprint 2 Tests
+
+| Test ID | BL | Status | Actual Result | Date | Notes |
+|---------|----|--------|---------------|------|-------|
+| T-23 | BL-09 | Pass | Today filter showed only the task with today's deadline. Task count badge updated to `1 active`. | 20 Apr | - |
+| T-24 | BL-09 | Pass | This Week filter showed tasks for today and one other day this week; excluded next month task. | 20 Apr | Tested across a week boundary (Mon-Sun) |
+| T-25 | BL-09 | Pass | Clicking All after Today filter restored the full task list. | 20 Apr | - |
+| T-26 | BL-09 | Pass | Empty state showed `No tasks due today` when Today filter was active with no matching tasks. | 20 Apr | - |
+| T-27 | BL-09 | Pass | Active filter button visually highlighted. Other view buttons returned to default style. | 20 Apr | - |
+| T-28 | BL-11 | Pass | High priority filter showed only High priority tasks. Medium and Low tasks hidden. | 20 Apr | - |
+| T-29 | BL-11 | Pass | Typing `net` in module search showed only the Networking task. Case-insensitive. | 20 Apr | - |
+| T-30 | BL-11 | Pass | This Week + High priority filters combined correctly to show only High priority tasks this week. | 20 Apr | - |
+| T-31 | BL-11 | Pass | Clear Filters reset all filters; full task list shown; all filter buttons returned to default. | 20 Apr | - |
+| T-32 | BL-11 | Pass | Module search input cleared after Clear Filters. All tasks visible. | 20 Apr | Bug found and fixed: DOM input value was not being reset, only the state object. |
+| T-33 | BL-12 | Pass | Tasks sorted by nearest deadline first. Overdue tasks at top. Completed tasks at bottom. | 20 Apr | - |
+| T-34 | BL-12 | Pass | Priority sort: High tasks first, then Medium, then Low. Within same priority, ordered by deadline. | 20 Apr | Secondary deadline sort within same priority added after this test. |
+| T-35 | BL-12 | Pass | Sort mode remained Priority after switching between view filters. | 20 Apr | - |
+| T-36 | BL-15 | Pass | Total and Active both increased by 1 after adding a task. | 20 Apr | - |
+| T-37 | BL-15 | Pass | Done count increased, Active decreased, progress bar updated on marking task complete. | 20 Apr | - |
+| T-38 | BL-15 | Pass | 2/4 tasks complete showed 50% progress bar width and `50% complete (2/4)` label. | 20 Apr | - |
+| T-39 | BL-15 | Pass | All tasks complete triggered green glow on progress bar. Label read `All tasks completed!`. | 20 Apr | - |
+| T-40 | BL-15 | Pass | Deleting all tasks showed 0/0/0 stats, empty progress bar, and `No tasks yet` label. | 20 Apr | - |
+
+---
+
+## 6.3 Known Issues & Bugs
+
+| Issue | Severity | Status | Notes |
+|-------|----------|--------|-------|
+| No dedicated daily/weekly calendar grid view | Low | Deferred | The Today and This Week filters address the core use case. A calendar grid layout is in the remaining future backlog (BL-10). |
+| Module field is free text with no autocomplete | Low | Deferred | A future version could offer a dropdown populated from previously entered module names to prevent inconsistency (e.g. `SD2` vs `Software Development 2`). |
+| Delete uses browser default `confirm()` | Low | Open | Works correctly but appearance varies by browser. A custom modal would be more consistent. |
+| No undo after deleting a task | Low | Deferred | A brief Undo toast notification is a future improvement. |
+| Filter state is not persisted in localStorage | Low | Deferred | Filters reset to All on page load. Persisting the sort preference at minimum would improve returning users' experience. |
+
+---
+
+## 6.4 Screenshots
+
+*Screenshots of the final working application are included below. All screenshots were taken in Google Chrome.*
+
+Recommended evidence captured:
+
+- Mobile view (375px) - task list with multiple tasks and priority colour coding
+- Desktop view (1024px+) - two-column layout with form sticky on left
+- Filter bar - showing active filters (This Week + High priority) with task count updated
+- Today filter - active with matching tasks visible
+- Sort control - Priority mode active
+- Progress bar - at 75% completion with stats
+- All tasks complete - progress bar glowing green
+- Edit mode - form pre-filled with task values
+- Validation - error messages for empty title and past deadline
+- Empty state with filter - `No tasks due today` message
+
+### Screenshot Placeholders
+
+```markdown
+![Mobile view showing multiple tasks](assets/screenshots/mobile-task-list.png)
+
+![Desktop two-column layout](assets/screenshots/desktop-layout.png)
+
+![Filter bar with active filters](assets/screenshots/filter-bar.png)
+
+![Today filter active](assets/screenshots/today-filter.png)
+
+![Priority sort active](assets/screenshots/priority-sort.png)
+
+![Progress bar at 75 percent](assets/screenshots/progress-bar.png)
+
+![All tasks completed progress state](assets/screenshots/all-complete.png)
+
+![Edit mode with pre-filled form](assets/screenshots/edit-mode.png)
+
+![Validation errors](assets/screenshots/validation-errors.png)
+
+![Filtered empty state](assets/screenshots/filtered-empty-state.png)
+```
+
+---
+
+## 6.5 Final Evaluation
+
+StudyFlow successfully evolved from a basic CRUD prototype into a more usable student task-management application across two sprints.
+
+Sprint 1 delivered the essential task-management workflow:
+
+- Create tasks
+- Display tasks
+- Edit tasks
+- Delete tasks
+- Mark tasks as complete
+- Apply mobile-first styling
+
+Sprint 2 improved the product by adding:
+
+- Daily and weekly filters
+- Priority filtering
+- Module search
+- Sorting by deadline or priority
+- Progress summary and completion percentage
+
+The final product demonstrates clear alignment between requirements, backlog items, implementation decisions, and testing evidence. The system remains limited by its single-device localStorage architecture, but this is appropriate for the current coursework scope and has been clearly identified as a future improvement area.
+
