@@ -686,3 +686,159 @@ Testing is conducted manually by working through each backlog item's acceptance 
 | T-40 | Empty state shows No tasks yet | Delete all tasks. | Stats show 0/0/0, progress bar is empty, label reads `No tasks yet`. |
 
 ---
+
+
+# 4. Project Management
+
+## 4.1 Sprint Review Meetings
+
+### Review 1 - Sprint Planning (Date: 10 March 2026)
+
+**What was done since the last meeting:**
+
+- Completed the project pitch (Assignment 1) and received feedback
+- Drafted the full System Design Document including user stories, backlog, architecture, UI design, state diagram, and test plan
+- Set up the GitHub repository with initial commits
+
+**What is planned for this session:**
+
+- Set up project file structure (`index.html`, `style.css`, `app.js`)
+- Build the task creation form with all required fields
+- Begin implementing input validation
+
+**Current problems and barriers:**
+
+- Decided on inline form over modal for task creation - simpler on mobile
+- Resolved unique ID generation using `Date.now()` plus a random string
+
+---
+
+### Review 2 - Mid-Sprint Check (Date: 14 March 2026)
+
+**What was done since the last meeting:**
+
+- Completed BL-01: project setup with semantic HTML structure
+- Completed BL-02: task creation form with all four fields
+- Completed BL-03: input validation for empty title, missing deadline, and past deadline
+- Completed BL-04: task list display with colour-coded priority badges
+- Started BL-05: mark task as complete
+
+**What is planned for this session:**
+
+- Finish BL-05 (completion toggle)
+- Build BL-06 (edit task)
+- Build BL-07 (delete task with confirmation)
+
+**Current problems and barriers:**
+
+- Date comparison time zone issue - fixed by storing and comparing dates as `YYYY-MM-DD` strings
+- Task list was not updating immediately - fixed by reordering function calls so render occurs after array update
+- CSS for priority card borders took longer than expected on mobile
+
+---
+
+### Review 3 - Sprint 1 Review & Retrospective (Date: 19 March 2026)
+
+**What was done since the last meeting:**
+
+- Completed BL-05, BL-06, BL-07, and BL-08
+- Added localStorage persistence (moved from future backlog)
+- Ran all 22 Sprint 1 test cases - all passed
+
+**What is planned for this session:**
+
+- Final bug fixes
+- Prepare for the 10-minute project demo
+
+**Current problems and barriers:**
+
+- Edit form not scrolling into view on mobile - fixed with `scrollIntoView({ behavior: "smooth" })`
+- Form accepted whitespace-only titles - fixed with `.trim()` in validation
+- Completed task sorting was inconsistent - fixed with explicit sort function
+
+**Retrospective:**
+
+- Iterative feature-by-feature development worked well because the app remained in a working state throughout the sprint.
+- Writing acceptance criteria before coding gave a clear target for testing.
+- Mobile-first CSS was efficient because the desktop media query was mostly layout adjustment.
+- In future, CSS should start earlier because some HTML needed small changes once the final layout evolved.
+- The `editingTaskId` flag approach for form reuse was effective but required careful handling of cancel/reset behaviour.
+
+---
+
+### [S2] Review 4 - Sprint 2 Planning (Date: 1 April 2026)
+
+**What was done since the last meeting:**
+
+- Sprint 1 demo completed and submitted
+- Reviewed Sprint 1 retrospective feedback
+- Selected Sprint 2 backlog items based on user value and achievability: BL-09, BL-11, BL-12, BL-15
+
+**What is planned for this session:**
+
+- Implement progress summary (BL-15)
+- Formalise the sort logic and add a sort control (BL-12)
+- Begin designing the filter bar layout for BL-09 and BL-11
+
+**Current problems and barriers:**
+
+- Need to decide how to manage filter state - decided on a single `filterState` object rather than separate variables for each filter
+- Week boundary calculation needs careful testing to handle weeks that span month changes
+
+---
+
+### [S2] Review 5 - Sprint 2 Mid-Sprint (Date: 12 April 2026)
+
+**What was done since the last meeting:**
+
+- Completed BL-15: progress summary with animated progress bar and glow effect when all tasks are complete
+- Completed BL-12: sort control with Deadline and Priority modes
+- Completed BL-09: view filter bar with All / Today / This Week toggle
+- Introduced `filterState` object
+- Updated empty state messages to reflect active filter context
+
+**What is planned for this session:**
+
+- Complete BL-11: priority filter buttons and module search input
+- Implement `getFilteredTasks()` to stack all three filters
+- Add **Clear Filters** button and `updateFilterUI()` function
+- Begin Sprint 2 testing
+
+**Current problems and barriers:**
+
+- Week boundary initially used `getDay()`, which treats Sunday as 0. This caused off-by-one behaviour for a Monday-start week. Fixed using `(dayOfWeek + 6) % 7`.
+- Filter bar was overflowing on 360px screens. Resolved by making button groups scroll-safe on small viewports.
+- Combined filters required careful ordering: view filter first, then priority, then module text search.
+
+---
+
+### [S2] Review 6 - Sprint 2 Review & Retrospective (Date: 24 April 2026)
+
+**What was done since the last meeting:**
+
+- Completed BL-11: priority filter buttons and module search
+- Confirmed filters work independently and in combination with the view filter
+- Executed all Sprint 2 test cases (T-23 to T-40) - all passed
+- Updated README with Sprint 2 documentation throughout
+
+**What is planned for this session:**
+
+- Final review of all Sprint 2 code and documentation
+- Record 3-minute video vignette
+- Submit Assignment 3
+
+**Current problems and barriers:**
+
+- **Clear Filters** was not resetting the module search input value in the DOM. It only reset the state object. Fixed by setting `moduleSearchInput.value = ""` in the reset function.
+- Priority sort needed a secondary sort by deadline within the same priority level. Added after T-34 revealed tasks within the same priority appeared in arbitrary order.
+- All issues resolved before submission.
+
+**Retrospective - Sprint 2:**
+
+- The `filterState` object approach worked well because adding BL-11 on top of BL-09 required extending the object and filter function, not rewriting the renderer.
+- Writing the This Week filter revealed a gap in the original design because the state diagram did not account for filtered views. The diagram was updated to include `FilteredView`.
+- The progress summary (BL-15) was the quickest Sprint 2 item because the HTML structure already existed from Sprint 1.
+- Future improvement: persist sort preference in `localStorage` so it survives a page refresh.
+- Future improvement: replace module search with a dropdown populated dynamically from unique module names.
+
+---
