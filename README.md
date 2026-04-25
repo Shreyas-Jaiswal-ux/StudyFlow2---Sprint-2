@@ -913,3 +913,35 @@ xychart-beta
 | 20 Apr | Added Clear Filters button to BL-11 scope | Testing with stacked filters showed that resetting three separate controls was cumbersome. A single reset action improves usability. |
 
 ---
+
+# 5. Software Tools & Techniques
+
+## 5.1 Development Tools
+
+| Tool | Purpose | Why Chosen |
+|------|---------|------------|
+| Visual Studio Code | Code editor | Lightweight, built-in terminal, IntelliSense for HTML/CSS/JS |
+| Google Chrome DevTools | Debugging & testing | DOM inspection, console, device emulation for responsive testing |
+| Git | Version control | Track changes, commit history per feature, ability to roll back |
+| GitHub | Remote repository | Hosts the project, provides backup, submission via repo link |
+| Live Server (VS Code extension) | Local development server | Auto-refreshes the browser on save |
+
+## 5.2 Coding Techniques
+
+| Technique | Where Used | Benefit |
+|-----------|------------|---------|
+| DOM manipulation | Rendering tasks, updating UI | Direct control over page content without a framework |
+| Event listeners | Form submission, button clicks, checkbox toggles, filter buttons | Clean separation between HTML structure and JS behaviour |
+| Array methods (`filter`, `map`, `find`, `findIndex`, `sort`) | Task filtering, searching, rendering, sorting | Concise and readable data operations |
+| Template literals | Building HTML strings for task cards | Cleaner string construction with embedded expressions |
+| `JSON.stringify()` / `JSON.parse()` | localStorage read/write | Converts task array to/from storable string format |
+| CSS custom properties (variables) | Colour palette, spacing | Consistent theming; easy to update colours in one place |
+| CSS Flexbox | Page layout, card layout, form layout, filter bar | Responsive alignment without floats |
+| Media queries | Responsive breakpoints | Adapts layout from mobile to desktop at `768px` |
+| Semantic HTML | Page structure | Improves accessibility and readability |
+| [S2] State object pattern | `filterState` object | Centralises all filter values; makes multi-filter logic readable and extensible |
+| [S2] Composed filter functions | `getFilteredTasks()` | Applies all active filters in sequence; easy to add new filter dimensions |
+| [S2] Data attribute selectors | Filter buttons use `data-filter` and `data-priority` attributes | Avoids hardcoded class-based logic for identifying active filters |
+
+---
+
