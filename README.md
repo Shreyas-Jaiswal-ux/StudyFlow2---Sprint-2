@@ -549,3 +549,140 @@ The filter bar uses the same design tokens as the rest of the app:
 | Progress bar in header | Immediate feedback | Could distract if over-animated |
 
 ---
+
+## 3.5 State Diagram
+
+### [S2] Updated Application States (Sprint 2)
+
+The Sprint 2 filter state is separate from the task interaction states. The user can change filters at any time regardless of whether they are in Add or Edit mode.
+
+```mermaid
+stateDiagram-v2
+
+    [*] --> EmptyState
+
+    EmptyState --> TaskList : Add Task
+
+    TaskList --> TaskList : Add Task
+    TaskList --> Editing : Click Edit
+    TaskList --> ConfirmDelete : Click Delete
+    TaskList --> Completed : Toggle Complete
+    TaskList --> FilteredView : Change Filter / Sort
+
+    Editing --> TaskList : Save Changes
+    Editing --> TaskList : Cancel
+
+    ConfirmDelete --> TaskList : Confirm Delete
+    ConfirmDelete --> TaskList : Cancel
+
+    Completed --> TaskList : Toggle Again
+
+    FilteredView --> FilteredView : Change Filter / Sort
+    FilteredView --> TaskList : Clear Filters
+    FilteredView --> Editing : Click Edit on Filtered Task
+    FilteredView --> ConfirmDelete : Click Delete on Filtered Task
+
+    TaskList --> EmptyState : Delete All Tasks
+```
+
+### State Diagram Evaluation
+
+The diagram shows that filtering is a **view transformation**, not a destructive data operation. This means:
+
+- The task array remains unchanged.
+- Only the visible task list changes.
+- Edit and delete still work on filtered tasks because every task keeps its unique ID.
+
+---
+
+## 3.6 Technical Challenges
+
+| Challenge | Description | Solution |
+|-----------|-------------|----------|
+| Unique task IDs | Each task needs a unique identifier for edit and delete operations. | Generate a unique ID using `Date.now().toString(36)` combined with a random suffix. |
+| Date handling | JavaScript Date objects can behave inconsistently across browsers and time zones. | Store deadlines as `YYYY-MM-DD` strings and compare as strings for filtering, avoiding time zone issues. |
+| Form reuse for add and edit | The same form is used for creating and editing tasks. | Use a flag variable (`editingTaskId = null`). Null = create; an ID value = update. Reset after each submission. |
+| [S2] Stacking multiple filters | Applying view, priority, and module filters simultaneously without losing track of which filters are active. | A single `filterState` object holds all active filter values. `getFilteredTasks()` applies them sequentially in one pass, keeping the logic readable and testable. |
+| [S2] Empty state with filters active | When filters return no results, the empty state message should explain why rather than showing a generic message. | The renderer passes the active filter context to the empty state renderer, which selects an appropriate message string. |
+| [S2] Week boundary calculation | Determining the start (Monday) and end (Sunday) of the current week reliably, including month/year boundaries. | `getWeekRange()` calculates Monday by subtracting `(dayOfWeek + 6) % 7` days from today, then adds 6 for Sunday, using `YYYY-MM-DD` string comparisons. |
+
+### Technical Evaluation
+
+The most important Sprint 2 technical improvement is the **filter pipeline**:
+
+```text
+Original tasks array
+        ↓
+View filter (All / Today / This Week)
+        ↓
+Priority filter
+        ↓
+Module search filter
+        ↓
+Sort order
+        ↓
+Rendered task cards
+```
+
+This pipeline is maintainable because each transformation has a clear purpose. It also supports future expansion, such as adding a completed/incomplete filter or module dropdown.
+
+---
+
+## 3.7 Test Plan
+
+Testing is conducted manually by working through each backlog item's acceptance criteria. Each criterion is treated as an individual test case.
+
+### Test Log Structure
+
+| Column | Description |
+|--------|-------------|
+| Test ID | Unique identifier |
+| Related Backlog Item | Which BL item is being tested |
+| Test Description | What is being tested |
+| Steps to Reproduce | Exact steps to perform the test |
+| Expected Result | What should happen |
+| Actual Result | What actually happened |
+| Status | Pass / Fail |
+| Notes | Observations, bugs found, or fixes applied |
+
+### [S2] Sprint 2 Test Cases
+
+#### BL-09: Daily and Weekly View Filter
+
+| Test ID | Test Description | Steps | Expected Result |
+|---------|------------------|-------|-----------------|
+| T-23 | Today filter shows only today's tasks | Add a task with today's deadline and one with a future deadline. Click **Today**. | Only the task due today is visible. Task count badge updates. |
+| T-24 | This Week filter shows tasks in current week | Add tasks for today, a day this week, and next month. Click **This Week**. | Only tasks within the current Mon-Sun window are shown. |
+| T-25 | All filter restores full list | Apply Today filter, then click **All**. | All tasks are visible again. |
+| T-26 | Empty state message reflects active filter | Apply Today filter with no tasks due today. | Empty state shows *No tasks due today* rather than the default message. |
+| T-27 | Active filter button is highlighted | Click **This Week**. | This Week button is visually highlighted. All and Today buttons are not. |
+
+#### BL-11: Filter by Module and Priority
+
+| Test ID | Test Description | Steps | Expected Result |
+|---------|------------------|-------|-----------------|
+| T-28 | Priority filter shows correct tasks | Create tasks with High, Medium, Low priority. Click **High**. | Only High priority tasks are shown. |
+| T-29 | Module search filters by text | Create tasks with modules `Networking` and `Mathematics`. Type `net` in the module search. | Only the Networking task is shown (case-insensitive match). |
+| T-30 | Combined filters stack correctly | Apply This Week view filter and High priority filter. | Only High priority tasks due this week are shown. |
+| T-31 | Clear Filters resets all filters | Apply multiple filters. Click **Clear Filters**. | All filters reset; full task list is shown; all filter buttons return to unselected state. |
+| T-32 | Module search clears on Clear Filters | Type in module search field. Click **Clear Filters**. | Module search input is cleared and all tasks are visible. |
+
+#### BL-12: Sort by Deadline or Priority
+
+| Test ID | Test Description | Steps | Expected Result |
+|---------|------------------|-------|-----------------|
+| T-33 | Default sort is by deadline | Add tasks with different deadlines. Check task order. | Tasks sorted by nearest deadline first; overdue tasks at top; completed tasks at bottom. |
+| T-34 | Priority sort orders High -> Medium -> Low | Switch sort to **Priority**. | High priority tasks appear first, then Medium, then Low. Within same priority, deadline order is maintained. |
+| T-35 | Sort persists across filter changes | Set sort to Priority. Apply a filter. | Sort order remains Priority after applying the filter. |
+
+#### BL-15: Progress Summary
+
+| Test ID | Test Description | Steps | Expected Result |
+|---------|------------------|-------|-----------------|
+| T-36 | Stats update when task is added | Add a task. | Total and Active counts each increase by 1. |
+| T-37 | Stats update when task is completed | Mark a task as complete. | Done count increases; Active count decreases; progress bar updates. |
+| T-38 | Progress bar shows correct percentage | Add 4 tasks, complete 2. | Progress bar shows 50%, label reads `50% complete (2/4)`. |
+| T-39 | All tasks complete triggers glow | Complete all tasks. | Progress bar fills to 100% and glows. Label reads `All tasks completed!`. |
+| T-40 | Empty state shows No tasks yet | Delete all tasks. | Stats show 0/0/0, progress bar is empty, label reads `No tasks yet`. |
+
+---
