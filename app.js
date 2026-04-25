@@ -201,4 +201,114 @@ function updateFilterUI() {
     document.querySelectorAll('[data-filter]').forEach(btn => {
         btn.classList.toggle('filter-btn--active', btn.dataset.filter === filterState.view);
     });
+
+   // Priority buttons
+    document.querySelectorAll('[data-priority]').forEach(btn => {
+        btn.classList.toggle('filter-btn--active', btn.dataset.priority === filterState.priority);
+    });
  
+    // Sort buttons
+    document.querySelectorAll('[data-sort]').forEach(btn => {
+        btn.classList.toggle('sort-btn--active', btn.dataset.sort === filterState.sort);
+    });
+ 
+    // Clear filters button visibility
+    const clearBtn = document.getElementById('clear-filters-btn');
+    if (clearBtn) {
+        clearBtn.style.display = isFilterActive() ? 'inline-flex' : 'none';
+    }
+}
+ 
+// ---- Validation ----
+ 
+function validateForm(title, deadline) {
+    let isValid = true;
+    const titleError = document.getElementById('title-error');
+    const deadlineError = document.getElementById('deadline-error');
+    const titleInput = document.getElementById('task-title');
+    const deadlineInput = document.getElementById('task-deadline');
+ 
+    titleError.textContent = '';
+    deadlineError.textContent = '';
+    titleInput.classList.remove('form-input--error');
+    deadlineInput.classList.remove('form-input--error');
+ 
+    if (!title || title.trim() === '') {
+        titleError.textContent = 'Please enter a task title.';
+        titleInput.classList.add('form-input--error');
+        isValid = false;
+    }
+ 
+    if (!deadline) {
+        deadlineError.textContent = 'Please select a deadline.';
+        deadlineInput.classList.add('form-input--error');
+        isValid = false;
+    } else if (!editingTaskId && deadline < getTodayString()) {
+        deadlineError.textContent = 'Deadline cannot be in the past.';
+        deadlineInput.classList.add('form-input--error');
+        isValid = false;
+    }
+ 
+    return isValid;
+}
+ 
+function clearErrors() {
+    document.getElementById('title-error').textContent = '';
+    document.getElementById('deadline-error').textContent = '';
+    document.getElementById('task-title').classList.remove('form-input--error');
+    document.getElementById('task-deadline').classList.remove('form-input--error');
+}
+ 
+// ---- Renderer ----
+ 
+function renderTasks() {
+    const taskList = document.getElementById('task-list');
+    taskList.innerHTML = '';
+ 
+    // [SPRINT 2] Apply active filters and sort before rendering
+    const filtered = getFilteredTasks();
+    const sorted = sortTasks(filtered);
+ 
+    if (sorted.length === 0) {
+        // [SPRINT 2] Context-aware empty state message
+        const { title, subtitle } = getEmptyStateMessage();
+        taskList.innerHTML = `
+            <div class="empty-state" id="empty-state">
+                <div class="empty-state__icon">&#128203;</div>
+                <p class="empty-state__title">${title}</p>
+                <p class="empty-state__subtitle">${subtitle}</p>
+            </div>
+        `;
+        updateStats();
+        updateFilterUI();
+        return;
+    }
+ 
+    sorted.forEach((task, index) => {
+        const card = createTaskCard(task);
+        card.style.animationDelay = `${index * 0.05}s`;
+        taskList.appendChild(card);
+    });
+ 
+    updateStats();
+    updateFilterUI();
+}
+ 
+function updateStats() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const active = total - completed;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+ 
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-active').textContent = active;
+    document.getElementById('stat-done').textContent = completed;
+ 
+    const progressFill = document.getElementById('progress-fill');
+    progressFill.style.width = percentage + '%';
+ 
+    if (percentage === 100 && total > 0) {
+        progressFill.classList.add('progress-bar__fill--complete');
+    } else {
+        progressFill.classList.remove('progress-bar__fill--complete');
+    }
