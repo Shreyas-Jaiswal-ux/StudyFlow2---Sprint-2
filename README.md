@@ -842,3 +842,74 @@ Testing is conducted manually by working through each backlog item's acceptance 
 - Future improvement: replace module search with a dropdown populated dynamically from unique module names.
 
 ---
+
+## 4.2 Burndown Chart
+
+### Sprint 1 Burndown
+
+| Date | Story Points Remaining | Backlog Items Completed | Notes |
+|------|------------------------|-------------------------|-------|
+| 10 Mar | 22 | - | Sprint 1 start |
+| 11 Mar | 20 | BL-01 | HTML skeleton in place |
+| 12 Mar | 17 | BL-02 | Task creation form working |
+| 13 Mar | 15 | BL-03 | Validation added |
+| 14 Mar | 12 | BL-04 | Task list rendering |
+| 15 Mar | 10 | BL-05 | Completion toggle working |
+| 17 Mar | 7 | BL-06 | Edit functionality complete |
+| 18 Mar | 5 | BL-07 | Delete with confirmation working |
+| 19 Mar | 0 | BL-08 | Responsive CSS complete, all features tested |
+
+*Note: No work completed on 16 Mar (Sunday). The burndown line is flat, reflecting a planned break.*
+
+```mermaid
+xychart-beta
+    title "Sprint 1 Burndown"
+    x-axis ["10 Mar", "11 Mar", "12 Mar", "13 Mar", "14 Mar", "15 Mar", "16 Mar", "17 Mar", "18 Mar", "19 Mar"]
+    y-axis "Story Points Remaining" 0 --> 22
+    line [22, 20, 17, 15, 12, 10, 10, 7, 5, 0]
+```
+
+### [S2] Sprint 2 Burndown
+
+| Date | Story Points Remaining | Backlog Items Completed | Notes |
+|------|------------------------|-------------------------|-------|
+| 1 Apr | 10 | - | Sprint 2 start. Planning and design |
+| 3 Apr | 8 | BL-15 | Progress summary complete |
+| 7 Apr | 6 | BL-12 | Sort control complete |
+| 12 Apr | 3 | BL-09 | View filter (All/Today/This Week) complete |
+| 20 Apr | 0 | BL-11 | Module and priority filters complete; all tests passing |
+| 24 Apr | 0 | - | Final review and documentation |
+
+*Note: No work on weekends (6, 13 Apr). Burndown line reflects realistic development pace with university commitments alongside this project.*
+
+```mermaid
+xychart-beta
+    title "Sprint 2 Burndown"
+    x-axis ["1 Apr", "3 Apr", "7 Apr", "12 Apr", "20 Apr", "24 Apr"]
+    y-axis "Story Points Remaining" 0 --> 10
+    line [10, 8, 6, 3, 0, 0]
+```
+
+---
+
+## 4.3 Backlog Reviews
+
+### Sprint 1 Backlog Changes
+
+| Date | Change | Reason |
+|------|--------|--------|
+| 12 Mar | Added localStorage save/load to BL-02 scope | Without persistence, all test data was lost on page refresh during development. Added read/write early. |
+| 14 Mar | Updated BL-04 acceptance criteria to include sorting | Originally tasks displayed in creation order. Updated to sort by urgency (incomplete first, then by deadline). |
+| 17 Mar | Added `scrollIntoView()` to BL-06 | Mobile testing showed clicking Edit below the fold did not bring the form into view. |
+| 19 Mar | Moved BL-13 (localStorage) from future backlog to completed | Already implemented during BL-02 on 12 Mar. |
+
+### [S2] Sprint 2 Backlog Changes
+
+| Date | Change | Reason |
+|------|--------|--------|
+| 1 Apr | Selected BL-09, BL-11, BL-12, BL-15 for Sprint 2 | These four items cover the remaining realistic Should/Could Have user stories within achievable scope. BL-14 notifications deferred due to browser API complexity. |
+| 7 Apr | Extended BL-12 acceptance criteria to include secondary sort | Initial sort by priority did not specify secondary sort by deadline within same priority group. Added after testing showed arbitrary ordering. |
+| 12 Apr | Updated empty state criteria for BL-09 | Generic `No tasks yet` message would be confusing when a filter is active and returns no results. Added context-aware empty state messages. |
+| 20 Apr | Added Clear Filters button to BL-11 scope | Testing with stacked filters showed that resetting three separate controls was cumbersome. A single reset action improves usability. |
+
+---
