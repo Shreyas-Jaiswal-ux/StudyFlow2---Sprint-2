@@ -21,6 +21,8 @@
 
 ---
 
+
+
 # 1. User & System Requirements
 
 ## 1.1 User Requirements (User Stories)
@@ -101,5 +103,220 @@ System requirements define what the application must do technically to support t
 | NFR-06 | All interactive elements (buttons, inputs) shall have a minimum tap target size of 44x44px to meet mobile accessibility standards. | Accessibility |
 | NFR-07 | The system shall validate user input (e.g. prevent empty task titles, ensure deadlines are not in the past) and display clear error messages. | Robustness |
 | NFR-08 | The codebase shall be modular, with separate files or clearly separated sections for HTML structure, CSS styling, and JavaScript logic. | Maintainability |
+
+---
+
+
+
+
+# 2. Product Backlog
+
+## Sprint Overview
+
+| Sprint | Duration | Focus | Goal |
+|--------|----------|-------|------|
+| Sprint 1 | 10-20 Mar 2026 | Core functionality | Deliver a fully working task manager with CRUD operations, priority levels, module tagging, completion tracking, and mobile-first responsive design. |
+| **Sprint 2** | **1-25 Apr 2026** | **Enhanced filtering & UX** | **Extend the prototype with view filters (today/week), module and priority filtering, progress summary, and task sorting. All Sprint 1 functionality remains intact.** |
+
+**Estimation Scale (Story Points):**
+
+- 1 = Trivial (under 1 hour)
+- 2 = Small (1-2 hours)
+- 3 = Medium (2-4 hours)
+- 5 = Large (4-8 hours)
+- 8 = Complex (8+ hours)
+
+---
+
+## Sprint 1 - Core Functionality (Completed)
+
+### BL-01: Project setup and HTML structure
+
+- **Related Stories:** NFR-01, NFR-08
+- **Description:** Set up the project folder structure with separate HTML, CSS, and JS files. Create the base HTML page with semantic structure including a header, main content area, task list container, and a form area for adding tasks.
+- **Acceptance Criteria:**
+  - [x] Project contains `index.html`, `style.css`, and `app.js` as separate files
+  - [x] HTML uses semantic elements (`header`, `main`, `section`, `form`)
+  - [x] Page loads in a browser without errors
+  - [x] Basic layout structure is visible (header, content area, empty task list)
+- **Story Points:** 2 - **COMPLETE**
+
+---
+
+### BL-02: Task creation form
+
+- **Related Stories:** US-01, US-02, US-03, SR-01
+- **Description:** Build a form that allows the user to create a new task by entering a title, selecting a deadline, choosing a priority level, and entering a module name.
+- **Acceptance Criteria:**
+  - [x] Form includes fields for: title, deadline, priority (Low/Medium/High dropdown), and module name
+  - [x] Clicking **Add Task** creates a new task and displays it in the task list
+  - [x] The form clears after successful submission
+  - [x] Each task is stored as a JavaScript object with properties: `id`, `title`, `deadline`, `priority`, `module`, `completed`
+- **Story Points:** 3 - **COMPLETE**
+
+---
+
+### BL-03: Input validation
+
+- **Related Stories:** NFR-07
+- **Description:** Add validation to the task creation form to prevent invalid or incomplete data from being submitted.
+- **Acceptance Criteria:**
+  - [x] The form does not submit if the title field is empty
+  - [x] The form does not submit if no deadline is selected
+  - [x] The form does not accept a deadline date in the past
+  - [x] An error message is displayed next to the relevant field when validation fails
+  - [x] Error messages disappear once the user corrects the input
+- **Story Points:** 2 - **COMPLETE**
+
+---
+
+### BL-04: Task list display
+
+- **Related Stories:** US-05, SR-02, SR-05
+- **Description:** Display all tasks in a card layout. Each card shows the title, deadline, module name, and priority level with colour coding.
+- **Acceptance Criteria:**
+  - [x] All tasks currently in the array are rendered on the page
+  - [x] Each task card displays: title, deadline (formatted), module name, and priority level
+  - [x] Priority levels are colour-coded: green (Low), amber (Medium), red (High)
+  - [x] Completed tasks are visually distinct (strikethrough + faded appearance)
+  - [x] The task list updates immediately when a new task is added
+- **Story Points:** 3 - **COMPLETE**
+
+---
+
+### BL-05: Mark task as complete
+
+- **Related Stories:** US-04, SR-01
+- **Description:** Add a checkbox to each task card that allows the user to toggle the task's completion status.
+- **Acceptance Criteria:**
+  - [x] Each task has a clickable checkbox
+  - [x] Clicking the checkbox toggles the task's completed status
+  - [x] Completed tasks show a visual change (strikethrough, greyed out)
+  - [x] The user can un-complete a task by clicking the checkbox again
+- **Story Points:** 2 - **COMPLETE**
+
+---
+
+### BL-06: Edit task
+
+- **Related Stories:** US-06, SR-01
+- **Description:** Allow the user to edit an existing task's details using the same form, pre-filled with current values.
+- **Acceptance Criteria:**
+  - [x] Each task has an **Edit** button
+  - [x] Clicking **Edit** opens the task's details in the form pre-filled with current values
+  - [x] The user can change any field and save
+  - [x] The updated task is immediately reflected in the task list
+  - [x] Cancelling an edit does not change the task
+- **Story Points:** 3 - **COMPLETE**
+
+---
+
+### BL-07: Delete task
+
+- **Related Stories:** US-07, SR-01
+- **Description:** Allow the user to delete a task from the list with a confirmation step.
+- **Acceptance Criteria:**
+  - [x] Each task has a **Delete** button
+  - [x] Clicking **Delete** shows a confirmation prompt
+  - [x] Confirming the prompt removes the task from the list
+  - [x] The task list re-renders immediately after deletion
+  - [x] Cancelling the prompt keeps the task unchanged
+- **Story Points:** 2 - **COMPLETE**
+
+---
+
+### BL-08: Mobile-first responsive CSS
+
+- **Related Stories:** NFR-02, NFR-04, NFR-05, NFR-06
+- **Description:** Style the application with a mobile-first approach using a calm blue/neutral palette, with media queries for larger screens.
+- **Acceptance Criteria:**
+  - [x] The layout is designed for mobile viewports (360-428px) first
+  - [x] Body text is a minimum of 16px
+  - [x] All buttons and interactive elements have a minimum tap target of 44x44px
+  - [x] Colour palette uses blues and neutrals
+  - [x] A media query adjusts the layout for desktop screens (768px+)
+  - [x] No horizontal scrolling on mobile viewports
+- **Story Points:** 5 - **COMPLETE**
+
+**Sprint 1 Total: 22 story points - ALL COMPLETE**
+
+---
+
+## [S2] Sprint 2 - Enhanced Filtering & UX (NEW)
+
+> **Sprint 2 additions are highlighted throughout this document. New backlog items, development entries, meeting notes, and test cases all begin with `[S2]` to distinguish Sprint 2 content from Sprint 1.**
+
+### [S2] BL-09: Daily and weekly view filter
+
+- **Related Stories:** US-05, US-08, SR-02, SR-03
+- **Description:** Add a filter bar above the task list allowing the user to toggle between three views: **All** (show all tasks), **Today** (show only tasks with a deadline matching today's date), and **This Week** (show tasks due within the current Monday-Sunday period). The filter bar is always visible and the active view is highlighted.
+- **Acceptance Criteria:**
+  - [x] A filter bar is displayed above the task list with three options: **All**, **Today**, **This Week**
+  - [x] Selecting **Today** shows only tasks with `deadline === todayString`
+  - [x] Selecting **This Week** shows only tasks with deadlines falling within the current calendar week (Mon-Sun)
+  - [x] Selecting **All** removes the view filter and shows all tasks
+  - [x] The active filter is visually highlighted
+  - [x] The task count badge updates to reflect the filtered result
+  - [x] The empty state message updates to indicate no tasks match the current filter (e.g. *No tasks due today*)
+- **Story Points:** 3 - **COMPLETE (Sprint 2)**
+
+---
+
+### [S2] BL-11: Filter by module and priority
+
+- **Related Stories:** US-10, US-11, SR-04
+- **Description:** Add module and priority filter controls to the filter bar. The module filter is a text search that matches task module names. The priority filter is a set of toggle buttons (All, High, Medium, Low). Filters stack with the view filter (BL-09), e.g. a user can show only High priority tasks due this week.
+- **Acceptance Criteria:**
+  - [x] A priority filter is displayed with options: **All**, **High**, **Medium**, **Low**
+  - [x] Selecting a priority shows only tasks with that priority level; selecting **All** removes the priority filter
+  - [x] A module search input filters tasks whose module field contains the entered text (case-insensitive)
+  - [x] All filters (view, priority, module) work in combination
+  - [x] A **Clear Filters** button resets all filters to their default state
+  - [x] The active priority filter button is visually highlighted
+- **Story Points:** 3 - **COMPLETE (Sprint 2)**
+
+---
+
+### [S2] BL-12: Sort tasks by deadline or priority
+
+- **Related Stories:** US-13
+- **Description:** Formalise the task sorting behaviour. Tasks are sorted automatically: incomplete tasks appear above completed ones. Within incomplete tasks, overdue tasks appear first (most urgent), then by deadline ascending. Priority is used as a secondary sort within the same deadline. A sort control allows the user to switch between **Deadline** and **Priority** sort order.
+- **Acceptance Criteria:**
+  - [x] Completed tasks are always sorted to the bottom of the list
+  - [x] Overdue tasks appear at the top of the incomplete section
+  - [x] Within incomplete tasks, a **Sort by** control allows switching between deadline order and priority order
+  - [x] Priority order is: High -> Medium -> Low
+  - [x] The selected sort order is visually indicated
+  - [x] Sorting persists across filter changes within a session
+- **Story Points:** 2 - **COMPLETE (Sprint 2)**
+
+---
+
+### [S2] BL-15: Progress summary
+
+- **Related Stories:** US-12, SR-08
+- **Description:** Display a real-time progress summary in the header showing total tasks, active tasks, completed tasks, and a percentage progress bar. The progress bar animates when updated and glows when 100% is reached.
+- **Acceptance Criteria:**
+  - [x] Header displays: **Total**, **Active**, and **Done** counts
+  - [x] A progress bar shows the percentage of tasks completed
+  - [x] The bar width animates smoothly when tasks are added, completed, or deleted
+  - [x] When all tasks are complete, the bar glows green and the label reads *All tasks completed!*
+  - [x] When no tasks exist, the label reads *No tasks yet*
+  - [x] Stats update immediately on any task change
+- **Story Points:** 2 - **COMPLETE (Sprint 2)**
+
+**Sprint 2 Total: 10 story points - ALL COMPLETE**
+
+---
+
+## Remaining Future Backlog
+
+The following items were not implemented in Sprint 1 or Sprint 2. They remain documented for future development cycles.
+
+| ID | Feature | Related Stories | Story Points | Rationale for Deferral |
+|----|---------|----------------|-------------|----------------------|
+| BL-10 | Extended weekly view (Mon-Sun grid layout) | US-08, SR-03 | 3 | The This Week filter (BL-09) addresses the core use case; a calendar grid layout adds complexity without core value |
+| BL-13 | localStorage persistence | US-14, SR-07 | 3 | **Completed during Sprint 1** (implemented within BL-02) |
+| BL-14 | Reminder notifications | US-09, SR-06 | 5 | Technically complex (browser Notification API requires HTTPS and user permission); deferred |
 
 ---
