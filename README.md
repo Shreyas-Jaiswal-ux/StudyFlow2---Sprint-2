@@ -320,3 +320,232 @@ The following items were not implemented in Sprint 1 or Sprint 2. They remain do
 | BL-14 | Reminder notifications | US-09, SR-06 | 5 | Technically complex (browser Notification API requires HTTPS and user permission); deferred |
 
 ---
+
+# 3. Design & Development Documentation
+
+## 3.1 Overall Design & Architecture
+
+StudyFlow follows a **three-layer architecture** that separates concerns between presentation, logic, and data.
+
+### Presentation Layer (HTML / CSS)
+
+Handles the user interface. A single HTML page (`index.html`) is styled by an external stylesheet (`style.css`). The page is divided into three main areas:
+
+- Header with progress stats
+- Task form section
+- Task list section
+
+Sprint 2 adds a filter bar between the form section and the task list.
+
+### Logic Layer (JavaScript)
+
+All application behaviour is handled by a single JavaScript file (`app.js`). This layer contains five logical modules:
+
+- **Task Manager** - handles all CRUD operations on the task array
+- **Validation** - checks user input before a task is created or updated
+- **Renderer** - updates the DOM whenever task data or filter state changes
+- **Utilities** - helper functions for date formatting, ID generation, and overdue detection
+- **[S2] Filter & Sort Manager** - manages the active view filter, priority filter, module search, and sort order; applies all active filters before passing tasks to the renderer
+
+### Data Layer (Browser localStorage)
+
+Tasks are stored as a JSON array in `localStorage`.
+
+Filter state is not persisted. It resets on page load. This is an intentional design decision because each session should begin with the full task list, avoiding confusion from old filters still being active.
+
+### File Structure
+
+```text
+StudyFlow/
+|-- index.html      - Page structure and content (updated Sprint 2)
+|-- style.css       - All styling and responsive design (updated Sprint 2)
+|-- app.js          - Application logic and behaviour (updated Sprint 2)
+|-- README.md       - Project documentation (this file)
+```
+
+### Data Flow
+
+1. The user interacts with the UI, such as clicking **Add Task** or changing a filter.
+2. A DOM event triggers a JavaScript function in the logic layer.
+3. For task changes, the function validates input and updates the task array.
+4. The updated task array is saved to `localStorage`.
+5. For filter changes, the `filterState` object is updated.
+6. The renderer applies active filters and sort order.
+7. The filtered and sorted task list is re-drawn on the page.
+
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+
+    UI[Presentation Layer<br>HTML + CSS]
+    JS[Logic Layer<br>JavaScript app.js]
+    LS[Data Layer<br>localStorage]
+    FS[Filter & Sort Manager<br>Sprint 2]
+
+    UI -->|User actions| JS
+    JS -->|Validate input| JS
+    JS -->|Update task array| JS
+    JS -->|Save data| LS
+    LS -->|Load saved tasks| JS
+    UI -->|Filter/sort changes| FS
+    FS -->|Apply filters| JS
+    JS -->|Render updated UI| UI
+```
+
+### Architecture Evaluation
+
+Sprint 2 improves the architecture by separating **task data** from **view state**.
+
+| Concern | Stored In | Purpose |
+|--------|-----------|---------|
+| Task data | `tasks` array + `localStorage` | Permanent user-created task records |
+| View state | `filterState` object | Temporary UI filtering and sorting choices |
+| Rendered output | DOM | Current visible result after filtering and sorting |
+
+This separation is important because filters should not modify the original task data. They only transform how the data is displayed. This reduces the risk of accidental data loss and makes the filtering logic easier to test.
+
+---
+
+## 3.2 Development Strategy
+
+StudyFlow is developed using an **iterative, sprint-based approach**. Sprint 1 delivered the core CRUD functionality. Sprint 2 extends the prototype with filtering, sorting, and progress tracking without modifying or breaking any Sprint 1 functionality.
+
+### Sprint 2 Development Order
+
+1. **Progress summary (BL-15)** - implemented first because the header stats and progress bar structure already existed in the HTML from Sprint 1; this only required completing the JavaScript `updateStats()` function.
+2. **Sort control (BL-12)** - formalised the sort logic already in the renderer and added a sort toggle UI above the task list.
+3. **View filter (BL-09)** - added the filter bar with All / Today / This Week buttons; introduced the `filterState` object to the logic layer.
+4. **Module and priority filter (BL-11)** - extended `filterState` to include priority and module search; all three filters are applied together in a single `getFilteredTasks()` function before rendering.
+
+This order minimised risk. Each feature was added and tested before the next began. The filter state approach was chosen over multiple separate filter functions to keep the renderer simple. The renderer always calls `getFilteredTasks()` regardless of what changed.
+
+### [S2] Sprint 2 Highlighted Code Changes
+
+All Sprint 2 additions to the codebase are marked with a `// [SPRINT 2]` comment in `app.js` and a corresponding CSS block label in `style.css` for traceability.
+
+**New in `index.html` (Sprint 2):**
+
+- Filter bar section added above the task list
+- View toggle buttons: **All**, **Today**, **This Week**
+- Priority filter buttons: **All**, **High**, **Medium**, **Low**
+- Module search input
+- **Clear Filters** button
+- Sort control inside the task section header
+
+**New in `app.js` (Sprint 2):**
+
+- `filterState` object - stores active view (`all` / `today` / `week`), active priority (`all` / `High` / `Medium` / `Low`), and module search text
+- `getWeekRange()` - calculates the Monday and Sunday of the current week for the This Week filter
+- `getFilteredTasks()` - applies all active filters sequentially to the tasks array
+- `sortTasks()` - sorts filtered tasks by the active sort mode (deadline or priority)
+- `updateFilterUI()` - syncs the active visual state of filter buttons with the current filter state
+- `setupFilterListeners()` - attaches all event listeners for the filter bar controls
+- Extended `renderTasks()` to call `getFilteredTasks()` and `sortTasks()` before rendering
+
+**New in `style.css` (Sprint 2):**
+
+- `.filter-bar` - container for all filter controls
+- `.filter-group` - label and control row layout
+- `.filter-btn` - individual filter toggle button
+- `.filter-btn--active` - highlighted state for the active filter
+- `.filter-input` - module search input styling
+- `.sort-control` - sort selector above the task list
+
+### Development Strategy Evaluation
+
+| Strength | Explanation |
+|---------|-------------|
+| Low-risk iteration | Each feature was completed and tested before the next was started. |
+| Clear traceability | Each change maps to a backlog item and acceptance criteria. |
+| Maintainability | Sprint 2 functionality was added through new filter/sort functions rather than rewriting the full renderer. |
+| Controlled scope | Notification features were deferred because browser permissions and HTTPS requirements would introduce complexity beyond the sprint scope. |
+
+---
+
+## 3.3 Technology Stack
+
+### Core Technologies
+
+| Technology | Role | Justification |
+|-----------|------|---------------|
+| HTML5 | Page structure | Semantic elements improve accessibility. Native form elements reduce the need for custom components. |
+| CSS3 | Styling & layout | Flexbox and media queries enable a responsive, mobile-first layout without any CSS frameworks. |
+| JavaScript (ES6+) | Application logic | Handles all interactivity, data management, DOM manipulation, filtering, and sorting. No framework is needed for this scope. |
+| Browser localStorage | Data persistence | Stores tasks as a JSON string between sessions. Suitable for a single-user, client-side application. |
+
+### Why No Framework?
+
+A framework like React or Vue would add unnecessary complexity for an application of this size. Vanilla JavaScript provides full control over the DOM without the overhead of a build system or framework-specific syntax. This also means the app can be opened directly in a browser from the file system with no server or build step required.
+
+### Technology Trade-Offs
+
+| Decision | Benefit | Limitation |
+|---------|---------|------------|
+| Vanilla JavaScript | Lightweight, transparent, no dependencies | More manual DOM handling |
+| localStorage | Simple persistence, no backend required | Data is tied to one browser/device |
+| Single-page app | Fast, simple user flow | Limited scalability for multi-user features |
+| Manual testing | Easy to conduct and document | Less reliable than automated regression tests |
+
+---
+
+## 3.4 User Interface Design
+
+### Design Principles
+
+1. **Minimalist layout** - reduce cognitive load by showing only essential information.
+2. **Calm colour palette** - blues and neutral tones; high-contrast colours reserved for priority indicators.
+3. **Clear typography** - minimum font size of 16px for body text.
+4. **Accessible touch targets** - all buttons and interactive elements have a minimum size of 44x44px.
+
+### [S2] Sprint 2 UI Additions
+
+**Filter Bar** - positioned between the form section and the task list. It contains:
+
+- **View** toggle row: `All | Today | This Week`
+- **Priority** filter row: `All | High | Medium | Low`
+- **Module** text search input
+- **Clear Filters** button
+
+**Sort Control** - a compact `Sort by: Deadline | Priority` control inside the task section header. This allows the user to change task ordering without affecting the active filters.
+
+The filter bar uses the same design tokens as the rest of the app:
+
+- Colour variables
+- Border radius
+- Font size
+- Button spacing
+- Active state styling
+
+### Colour Palette
+
+| Colour | Hex Code | Usage |
+|--------|----------|-------|
+| Dark Blue | `#1A3A5C` | Header background, primary buttons |
+| Medium Blue | `#2E6B9E` | Active states, links, active filter buttons |
+| Light Blue | `#E8F0FE` | Card backgrounds, subtle highlights |
+| White | `#FFFFFF` | Page background |
+| Light Grey | `#F0F2F5` | Section backgrounds |
+| Dark Grey | `#333333` | Body text |
+| Red | `#D9534F` | High priority indicator |
+| Amber | `#F0AD4E` | Medium priority indicator |
+| Green | `#5CB85C` | Low priority indicator, completed tasks |
+
+### Responsive Design Approach
+
+- Base styles target mobile screens (360-428px width)
+- Media query at 768px switches to a two-column grid layout
+- Sprint 2 filter controls use wrapping/scroll-safe layouts to avoid breaking on narrow mobile screens
+- Buttons retain at least 44x44px tap targets
+
+### UI Design Evaluation
+
+| Design Decision | Benefit | Trade-Off |
+|----------------|---------|-----------|
+| Inline task form | Simple and mobile-friendly | Takes vertical space on small screens |
+| Filter bar above task list | Easy to find and use | Adds visual density |
+| Module text search | Flexible and quick | Users can type inconsistent module names |
+| Priority buttons | Faster than dropdown interaction | Takes more horizontal space |
+| Progress bar in header | Immediate feedback | Could distract if over-animated |
+
+---
