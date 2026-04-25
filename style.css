@@ -1,1 +1,100 @@
-
+/* ========================================
+   StudyFlow - style.css
+   Mobile-first responsive design
+   Sprint 2: Added filter bar, sort control styles
+   [SPRINT 2] markers indicate new additions
+   ======================================== */
+ 
+/* --- CSS Custom Properties (Colour Palette) --- */
+:root {
+    --color-primary: #1A3A5C;
+    --color-primary-light: #2E6B9E;
+    --color-primary-dark: #0F2640;
+    --color-accent: #E8F0FE;
+    --color-bg: #FFFFFF;
+    --color-bg-section: #F0F2F5;
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-border: #DDE1E6;
+    --color-priority-high: #D9534F;
+    --color-priority-medium: #F0AD4E;
+    --color-priority-low: #5CB85C;
+    --color-completed: #999999;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.10);
+    --transition: 0.25s ease;
+}
+ 
+/* --- Reset & Base --- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+ 
+body {
+    font-family: var(--font-family);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text);
+    background-color: var(--color-bg-section);
+    min-height: 100vh;
+}
+ 
+/* --- Animations --- */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+ 
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    70% {
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+ 
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+ 
+@keyframes progressGlow {
+    0%, 100% {
+        box-shadow: 0 0 4px rgba(92, 184, 92, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(92, 184, 92, 0.6);
+    }
+}
+ 
+/* --- Header --- */
+.header {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 50%, var(--color-primary-light) 100%);
+    color: #FFFFFF;
+    padding: 20px 20px 16px;
+    text-align: center;
+}
+ 
