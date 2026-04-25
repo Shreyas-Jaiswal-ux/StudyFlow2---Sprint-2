@@ -312,3 +312,209 @@ function updateStats() {
     } else {
         progressFill.classList.remove('progress-bar__fill--complete');
     }
+
+const progressText = document.getElementById('progress-text');
+    if (total === 0) {
+        progressText.textContent = 'No tasks yet';
+    } else if (percentage === 100) {
+        progressText.textContent = 'All tasks completed!';
+    } else {
+        progressText.textContent = `${percentage}% complete (${completed}/${total})`;
+    }
+ 
+    // [SPRINT 2] Task count badge reflects filtered count, not total
+    const taskCount = document.getElementById('task-count');
+    const filteredActive = getFilteredTasks().filter(t => !t.completed).length;
+    if (total > 0) {
+        taskCount.textContent = isFilterActive()
+            ? `${filteredActive} shown`
+            : `${active} active`;
+    } else {
+        taskCount.textContent = '';
+    }
+}
+ 
+function createTaskCard(task) {
+    const card = document.createElement('div');
+    card.className = `task-card task-card--${task.priority.toLowerCase()}${task.completed ? ' task-card--completed' : ''}`;
+    card.dataset.id = task.id;
+ 
+    const priorityClass = `task-card__badge--priority-${task.priority.toLowerCase()}`;
+    const overdue = !task.completed && isOverdue(task.deadline);
+    const deadlineLabel = task.completed ? formatDate(task.deadline) : getDeadlineLabel(task.deadline);
+    const deadlineClass = overdue ? 'task-card__badge--overdue' : 'task-card__badge--deadline';
+ 
+    card.innerHTML = `
+        <div class="task-card__header">
+            <input 
+                type="checkbox" 
+                class="task-card__checkbox" 
+                ${task.completed ? 'checked' : ''}
+                aria-label="Mark ${escapeHtml(task.title)} as ${task.completed ? 'incomplete' : 'complete'}"
+            >
+            <span class="task-card__title">${escapeHtml(task.title)}</span>
+        </div>
+        <div class="task-card__details">
+            <span class="task-card__badge ${deadlineClass}">${deadlineLabel}</span>
+            <span class="task-card__badge ${priorityClass}">${task.priority}</span>
+            ${task.module ? `<span class="task-card__badge">${escapeHtml(task.module)}</span>` : ''}
+        </div>
+        <div class="task-card__actions">
+            <button class="btn btn--small btn--edit" data-action="edit">Edit</button>
+            <button class="btn btn--small btn--delete" data-action="delete">Delete</button>
+        </div>
+    `;
+ 
+    const checkbox = card.querySelector('.task-card__checkbox');
+    checkbox.addEventListener('change', () => {
+        toggleComplete(task.id);
+        renderTasks();
+    });
+ 
+    const editBtn = card.querySelector('[data-action="edit"]');
+    editBtn.addEventListener('click', () => {
+        startEditing(task);
+    });
+ 
+    const deleteBtn = card.querySelector('[data-action="delete"]');
+    deleteBtn.addEventListener('click', () => {
+        if (confirm(`Are you sure you want to delete "${task.title}"?`)) {
+            deleteTask(task.id);
+            renderTasks();
+        }
+    });
+ 
+    return card;
+}
+ 
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+ 
+// ---- Form Handling ----
+ 
+function startEditing(task) {
+    editingTaskId = task.id;
+    document.getElementById('task-title').value = task.title;
+    document.getElementById('task-deadline').value = task.deadline;
+    document.getElementById('task-priority').value = task.priority;
+    document.getElementById('task-module').value = task.module;
+    document.getElementById('form-title').innerHTML = '<span class="form-icon" id="form-icon">&#9998;</span> Edit Task';
+    document.getElementById('submit-btn').innerHTML = '<span class="btn__icon">&#10003;</span> Save Changes';
+    document.getElementById('cancel-btn').style.display = 'inline-flex';
+    document.querySelector('.form-section').classList.add('form-section--editing');
+    clearErrors();
+    document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+ 
+function cancelEditing() {
+    editingTaskId = null;
+    document.getElementById('task-form').reset();
+    document.getElementById('form-title').innerHTML = '<span class="form-icon" id="form-icon">+</span> Add New Task';
+    document.getElementById('submit-btn').innerHTML = '<span class="btn__icon">+</span> Add Task';
+    document.getElementById('cancel-btn').style.display = 'none';
+    document.querySelector('.form-section').classList.remove('form-section--editing');
+    clearErrors();
+}
+ 
+function handleSubmit(e) {
+    e.preventDefault();
+ 
+    const title = document.getElementById('task-title').value.trim();
+    const deadline = document.getElementById('task-deadline').value;
+    const priority = document.getElementById('task-priority').value;
+    const module = document.getElementById('task-module').value.trim();
+ 
+    if (!validateForm(title, deadline)) return;
+ 
+    if (editingTaskId) {
+        updateTask(editingTaskId, title, deadline, priority, module);
+        cancelEditing();
+    } else {
+        addTask(title, deadline, priority, module);
+        document.getElementById('task-form').reset();
+        clearErrors();
+    }
+ 
+    renderTasks();
+}
+ 
+// ---- Clear Errors on Input ----
+ 
+function setupInputListeners() {
+    document.getElementById('task-title').addEventListener('input', () => {
+        document.getElementById('title-error').textContent = '';
+        document.getElementById('task-title').classList.remove('form-input--error');
+    });
+ 
+    document.getElementById('task-deadline').addEventListener('input', () => {
+        document.getElementById('deadline-error').textContent = '';
+        document.getElementById('task-deadline').classList.remove('form-input--error');
+    });
+}
+ 
+// ---- [SPRINT 2] Filter & Sort Event Listeners (BL-09, BL-11, BL-12) ----
+ 
+function setupFilterListeners() {
+    // View filter buttons
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterState.view = btn.dataset.filter;
+            renderTasks();
+        });
+    });
+ 
+    // Priority filter buttons
+    document.querySelectorAll('[data-priority]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterState.priority = btn.dataset.priority;
+            renderTasks();
+        });
+    });
+ 
+    // Module search input
+    const moduleSearch = document.getElementById('filter-module');
+    if (moduleSearch) {
+        moduleSearch.addEventListener('input', () => {
+            filterState.module = moduleSearch.value;
+            renderTasks();
+        });
+    }
+ 
+    // Clear Filters button
+    const clearBtn = document.getElementById('clear-filters-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            filterState.view = 'all';
+            filterState.priority = 'all';
+            filterState.module = '';
+            // Also reset the module search input DOM value
+            const moduleInput = document.getElementById('filter-module');
+            if (moduleInput) moduleInput.value = '';
+            renderTasks();
+        });
+    }
+ 
+    // Sort buttons
+    document.querySelectorAll('[data-sort]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterState.sort = btn.dataset.sort;
+            renderTasks();
+        });
+    });
+}
+ 
+// ---- Initialise ----
+ 
+document.addEventListener('DOMContentLoaded', () => {
+    loadTasks();
+    renderTasks();
+ 
+    document.getElementById('task-form').addEventListener('submit', handleSubmit);
+    document.getElementById('cancel-btn').addEventListener('click', cancelEditing);
+ 
+    setupInputListeners();
+    setupFilterListeners(); // [SPRINT 2]
+});
